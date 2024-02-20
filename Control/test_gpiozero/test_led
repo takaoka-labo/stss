@@ -1,0 +1,12 @@
+import pigpio
+import time
+
+led_gpio = 17
+gpio = pigpio.pi()
+gpio.set_mode(led_gpio, pigpio.OUTPUT)
+
+while True:
+    gpio.write(led_gpio, 1)
+    time.sleep(0.5)
+    gpio.write(led_gpio, 0)
+    time.sleep(0.5)
