@@ -6,6 +6,7 @@ from smartcard.Exceptions import NoCardException
 from smartcard.Exceptions import CardConnectionException
 
 box_cell_num = 6
+machine_ID = 1
 
 # define the APDUs used in this script
 SELECT = [0x00, 0xA4, 0x04, 0x00, 0x0A, 0xA0, 0x00, 0x00, 0x00, 0x62,
@@ -47,8 +48,9 @@ while True:
             extracted_bytes = data[1:data_size]
             ascii_chars = [chr(byte) for byte in extracted_bytes]
             string = ''.join(ascii_chars)
-            #print(string)
+            print(string)
             first_five_chars = string[:5]
+            
             
             with open('state.csv', 'r') as f:
                 csv_reader = csv.reader(f)
@@ -61,6 +63,7 @@ while True:
             
             with open('manage.csv', 'r') as f:
                 csv_reader = csv.reader(f)
+                manage_data = list(csv_reader)
                 for row in csv_reader:
                     temp_ID.append(row[0])
                     temp_name.append(row[1])
@@ -68,6 +71,7 @@ while True:
                         
                             
             if first_five_chars == "user.":
+                username = string[5:]
                  ##取り出し動作
                 print("何番の工具を取り出しますか？")
                 input_number = input("数値を入力してください: ")
@@ -76,6 +80,7 @@ while True:
                         serial_ID[i] = -1
                         tool_name[i] = "none"
                         tool_size[i] = "none"
+                        manage_data[i][5] = username
                 ## ここに取り出し処理
                 
             else:
@@ -83,6 +88,7 @@ while True:
                 for i in range(len(cell_ID)):
                     if serial_ID[i] == "-1" :
                         print("cell_ID: ",cell_ID[i],"に格納します")
+                        
                         ## ここに格納処理
                         serial_ID[i] = string
                         break            
@@ -105,7 +111,12 @@ while True:
                 for i in range(len(cell_ID)) :
                     print([cell_ID[i], serial_ID[i], tool_name[i], tool_size[i]])
                     csv_writer.writerow([cell_ID[i], serial_ID[i], tool_name[i], tool_size[i]])
-            #print("Select Applet: %02X %02X" % (sw1, sw2))
+            
+            ##manage.csvの情報を最新状態にする  
+            with open('manage.csv', 'w', newline='') as file:
+                csv_writer = csv.writer(file)
+                csv_writer.writerows(manage_data)
+             #print("Select Applet: %02X %02X" % (sw1, sw2))
             
             current_time = datetime.datetime.now()
             
