@@ -7,8 +7,6 @@ from smartcard.Exceptions import CardConnectionException
 
 box_cell_num = 6
 
-
-
 # define the APDUs used in this script
 SELECT = [0x00, 0xA4, 0x04, 0x00, 0x0A, 0xA0, 0x00, 0x00, 0x00, 0x62,
     0x03, 0x01, 0x0C, 0x06, 0x01]
@@ -24,14 +22,16 @@ r = readers()
 
 reader = r[0]
 
-cell_ID   = []
-serial_ID = []
-tool_name = []
-cell_size = []
-
-
 flag = True
 while True:
+    
+    cell_ID   = []
+    serial_ID = []
+    tool_name = []
+    tool_size = []
+    temp_ID   = []
+    temp_name = []
+    temp_size = []
     #time.sleep(2)   
     try: # Attempt to connect to the card
         connection = reader.createConnection()
@@ -47,55 +47,85 @@ while True:
             extracted_bytes = data[1:data_size]
             ascii_chars = [chr(byte) for byte in extracted_bytes]
             string = ''.join(ascii_chars)
-            print(string)
+            #print(string)
+            first_five_chars = string[:5]
             
             with open('state.csv', 'r') as f:
                 csv_reader = csv.reader(f)
                 for row in csv_reader:
+                    print(row[0],row[1],row[3])
                     cell_ID.append(row[0])
                     serial_ID.append(row[1])
-                    cell_size.append(row[3])
+                    tool_name.append(row[2])
+                    tool_size.append(row[3])              
             
             with open('manage.csv', 'r') as f:
                 csv_reader = csv.reader(f)
                 for row in csv_reader:
-                    for temp in serial_ID:
-                        if serial_ID == temp:
-                            tool_name.append(row[1])
-            
+                    temp_ID.append(row[0])
+                    temp_name.append(row[1])
+                    temp_size.append(row[2])
+                        
+                            
+            if first_five_chars == "user.":
+                 ##取り出し動作
+                print("何番の工具を取り出しますか？")
+                input_number = input("数値を入力してください: ")
+                for i in range(len(serial_ID)):
+                    if serial_ID[i] == input_number:  
+                        serial_ID[i] = -1
+                        tool_name[i] = "none"
+                        tool_size[i] = "none"
+                ## ここに取り出し処理
+                
+            else:
+                ##格納動作
+                for i in range(len(cell_ID)):
+                    if serial_ID[i] == "-1" :
+                        print("cell_ID: ",cell_ID[i],"に格納します")
+                        ## ここに格納処理
+                        serial_ID[i] = string
+                        break            
+                    else:
+                        if i == len(cell_ID):
+                            print("ボックスがいっぱいです") 
+                        
+            ##manage.csvから情報を取得してstate.csvの工具情報を更新    
+            for i in range(len(serial_ID)) :
+                #print(i,temp[i],serial_ID[i],len(serial_ID))
+                for j in range(len(temp_ID)) :
+                    #print(i,j,temp_ID[j],temp_name[j],serial_ID[i],tool_name[i])
+                    if serial_ID[i] == temp_ID[j]:
+                        tool_name[i] = temp_name[j]
+                        tool_size[i] = temp_size[j]
+                                          
+            ##state.csvの情報を最新状態にする
             with open('state.csv', 'w', newline='') as f:
                 csv_writer = csv.writer(f)
-                for i in range(len(cell_ID)):
-                    csv_writer.writerow([cell_ID[i], serial_ID[i], tool_name[i], cell_size[i]])
-
+                for i in range(len(cell_ID)) :
+                    print([cell_ID[i], serial_ID[i], tool_name[i], tool_size[i]])
+                    csv_writer.writerow([cell_ID[i], serial_ID[i], tool_name[i], tool_size[i]])
+            #print("Select Applet: %02X %02X" % (sw1, sw2))
             
-            print("Select Applet: %02X %02X" % (sw1, sw2))
-            
-   
             current_time = datetime.datetime.now()
             
             with open('log.csv', 'a', newline='') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow([string, current_time,])
                 
-                
-            
-                
-
-
     except NoCardException:
         # If no card is found, print a message and continue the loop
         if flag == False:
-            print("Not found")
+            print("Not found1")
             flag = True
         
     except CardConnectionException:
         if flag == False:
-            print("Not found")
+            print("Not found2")
             flag = True
-        
+    '''   
     except IndexError:
         if flag == False:
             print("Read Error")
             flag = True
-
+    '''
