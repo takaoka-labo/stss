@@ -79,7 +79,6 @@ while True:
                             if row[0] == input_number:
                                 row[4] = username
                                 row[3] = "using" 
-                                print("manage")
                         
                     
                 ## ここに取り出し処理
@@ -102,13 +101,10 @@ while True:
             ##manage.csvから情報を取得してstate.csvの工具情報を更新    
                 
             for i in range(len(serial_ID)) :
-                #print(i,temp[i],serial_ID[i],len(serial_ID))
                 for row in manage_data :
-                    #print(i,j,temp_ID[j],temp_name[j],serial_ID[i],tool_name[i])
                     if serial_ID[i] == row[0]:
                         tool_name[i] = row[1]
                         tool_size[i] = row[2]
-                        print("tetetetetete")
                                           
             ##state.csvの情報を最新状態にする
             with open('state.csv', 'w', newline='') as f:
