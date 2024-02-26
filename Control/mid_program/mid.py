@@ -30,9 +30,7 @@ while True:
     serial_ID = []
     tool_name = []
     tool_size = []
-    temp_ID   = []
-    temp_name = []
-    temp_size = []
+    
     #time.sleep(2)   
     try: # Attempt to connect to the card
         connection = reader.createConnection()
@@ -50,12 +48,13 @@ while True:
             string = ''.join(ascii_chars)
             print(string)
             first_five_chars = string[:5]
+            username = string[5:]
             
             
             with open('state.csv', 'r') as f:
                 csv_reader = csv.reader(f)
                 for row in csv_reader:
-                    print(row[0],row[1],row[3])
+                    #print(row[0],row[1],row[3])
                     cell_ID.append(row[0])
                     serial_ID.append(row[1])
                     tool_name.append(row[2])
@@ -64,14 +63,10 @@ while True:
             with open('manage.csv', 'r') as f:
                 csv_reader = csv.reader(f)
                 manage_data = list(csv_reader)
-                for row in csv_reader:
-                    temp_ID.append(row[0])
-                    temp_name.append(row[1])
-                    temp_size.append(row[2])
                         
                             
             if first_five_chars == "user.":
-                username = string[5:]
+               
                  ##取り出し動作
                 print("何番の工具を取り出しますか？")
                 input_number = input("数値を入力してください: ")
@@ -80,30 +75,40 @@ while True:
                         serial_ID[i] = -1
                         tool_name[i] = "none"
                         tool_size[i] = "none"
-                        manage_data[i][5] = username
+                        for row in manage_data:
+                            if row[0] == input_number:
+                                row[4] = username
+                                row[3] = "using" 
+                                print("manage")
+                        
+                    
                 ## ここに取り出し処理
                 
             else:
                 ##格納動作
                 for i in range(len(cell_ID)):
                     if serial_ID[i] == "-1" :
-                        print("cell_ID: ",cell_ID[i],"に格納します")
-                        
-                        ## ここに格納処理
                         serial_ID[i] = string
-                        break            
-                    else:
-                        if i == len(cell_ID):
-                            print("ボックスがいっぱいです") 
+                        print("cell_ID: ",cell_ID[i],"に格納します")    
+                        for row in manage_data:
+                            if row[0] == string:
+                                row[4] = username
+                                row[3] = machine_ID
+                        ## ここに格納処理
+                        break               
+                else:
+                    print("ボックスがいっぱいです") 
                         
             ##manage.csvから情報を取得してstate.csvの工具情報を更新    
+                
             for i in range(len(serial_ID)) :
                 #print(i,temp[i],serial_ID[i],len(serial_ID))
-                for j in range(len(temp_ID)) :
+                for row in manage_data :
                     #print(i,j,temp_ID[j],temp_name[j],serial_ID[i],tool_name[i])
-                    if serial_ID[i] == temp_ID[j]:
-                        tool_name[i] = temp_name[j]
-                        tool_size[i] = temp_size[j]
+                    if serial_ID[i] == row[0]:
+                        tool_name[i] = row[1]
+                        tool_size[i] = row[2]
+                        print("tetetetetete")
                                           
             ##state.csvの情報を最新状態にする
             with open('state.csv', 'w', newline='') as f:
@@ -134,9 +139,9 @@ while True:
         if flag == False:
             print("Not found2")
             flag = True
-    '''   
+       
     except IndexError:
         if flag == False:
             print("Read Error")
             flag = True
-    '''
+
