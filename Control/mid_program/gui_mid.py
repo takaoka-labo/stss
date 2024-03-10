@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 import datetime
 import csv
+import tkinter as tk
+
 from smartcard.System import readers
 from smartcard.Exceptions import NoCardException
 from smartcard.Exceptions import CardConnectionException
@@ -23,7 +25,16 @@ r = readers()
 
 reader = r[0]
 
-print("タグをタッチしてください")
+gui_root = tk.Tk()
+gui_root.title("STSS Control Panel")
+gui_root.geometry("1024x600")
+label1 = tk.Label(text='タグをタッチしてください', foreground='black', background='gray')
+#gui_root.mainloop()
+input_number = tk.IntVar()
+
+def on_button_click(id):
+    input_number.set(id)
+
 
 flag = True
 while True:
@@ -33,9 +44,11 @@ while True:
     tool_name = []
     tool_size = []
     
+    label1 = tk.Label(text='タグをタッチしてください', foreground='black', background='gray')
+    label1.pack()
+  
     #time.sleep(2)   
     try: # Attempt to connect to the card
-
         connection = reader.createConnection()
         connection.connect()
 
@@ -45,8 +58,6 @@ while True:
         data_size = data_01[1] - 6
         
         if flag == True:
-            
-            
             flag = False
             extracted_bytes = data[1:data_size]
             ascii_chars = [chr(byte) for byte in extracted_bytes]
@@ -54,6 +65,7 @@ while True:
             print(string)
             first_five_chars = string[:5]
             username = string[5:]
+            
             
             
             with open('state.csv', 'r') as f:
@@ -71,12 +83,28 @@ while True:
                         
                             
             if first_five_chars == "user.":
+                gui_root.destroy()
+                gui_root = tk.Tk()
+                gui_root.title("STSS Control Panel")
+                gui_root.geometry("1024x600")
+                gui_root.mainloop()
                
                  ##取り出し動作
-                print("何番の工具を取り出しますか？")
-                input_number = input("数値を入力してください: ")
+                
+                #print("何番の工具を取り出しますか？")
+                #input_number = input("数値を入力してください: ")
+                
+                for id in serial_ID:
+                    if id != -1:
+                    # -1以外の要素が見つかった場合、その要素をボタンの名前として使用
+                        label1 = tk.Label(text='何番の工具を取り出しますか？', foreground='black', background='gray')
+                        label1.pack()
+                        button = tk.Button(gui_root, text=str(id), command=lambda id=id: on_button_click(id))
+                        button.pack()
+                        gui_root.mainloop()
+                        
                 for i in range(len(serial_ID)):
-                    if serial_ID[i] == input_number:  
+                    if serial_ID[i] == input_number.get():  
                         serial_ID[i] = -1
                         tool_name[i] = "none"
                         tool_size[i] = "none"
@@ -84,8 +112,7 @@ while True:
                             if row[0] == input_number:
                                 row[4] = username
                                 row[3] = "using" 
-                        
-                    
+                                
                 ## ここに取り出し処理
                 
             else:
@@ -106,7 +133,9 @@ while True:
             ##manage.csvから情報を取得してstate.csvの工具情報を更新    
                 
             for i in range(len(serial_ID)) :
+                #print(i,temp[i],serial_ID[i],len(serial_ID))
                 for row in manage_data :
+                    #print(i,j,temp_ID[j],temp_name[j],serial_ID[i],tool_name[i])
                     if serial_ID[i] == row[0]:
                         tool_name[i] = row[1]
                         tool_size[i] = row[2]
@@ -129,22 +158,24 @@ while True:
             with open('log.csv', 'a', newline='') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow([string, current_time,])
-                
+    
+        gui_root.mainloop()
+               
     except NoCardException:
         # If no card is found, print a message and continue the loop
         if flag == False:
-            #print("Not found1")
+            print("Not found1")
             flag = True
-            print("タグをタッチしてください")
         
     except CardConnectionException:
         if flag == False:
-            #print("Not found2")
+            print("Not found2")
             flag = True
-            print("タグをタッチしてください")
        
     except IndexError:
         if flag == False:
-            #print("Read Error")
+            print("Read Error")
             flag = True
+            
+
 
