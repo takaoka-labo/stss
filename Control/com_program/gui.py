@@ -48,21 +48,35 @@ def com_receive():
                 df = pd.read_csv('state.csv',header=None)
                 df = df[df.iloc[:, 1] != -1]
                 print(df)
-
+                '''
                 # 既存のボタンを全て削除
                 for button in buttons.values():
                     button.destroy()
                 buttons.clear()
-
+                '''
                 # ボタンを作成
                 for index, row in df.iterrows():
                     button = create_button(str(row.iloc[1]),str(row.iloc[2]))
                     button.place(x=10 + index * 150, y=300)  # ボタンの位置を調整
                     buttons[str(row.iloc[2])] = button
-            
+            '''
             if(mess != 'tool_extract'):
-                message(mess+'を取り出しています')
+                message('Retrieving work in progress')
+            '''
+            # 既存のボタンを全て削除
+            for button in buttons.values():
+                button.destroy()
+            buttons.clear()
+            
+            if(mess == 'box_full'):
+                
+                message('Box is full')
 
+            if(mess == 'stand'):
+                message('Please touch the tag')
+            
+            if(mess == 'return'):
+                message('Setting storage location...')
 
         except:
             print('Error')

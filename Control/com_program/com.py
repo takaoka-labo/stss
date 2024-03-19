@@ -1,12 +1,50 @@
 #! /usr/bin/env python
 import datetime
 import csv
+import socket
+import tkinter
+
+from socket import socket, AF_INET, SOCK_STREAM
+
 from smartcard.System import readers
 from smartcard.Exceptions import NoCardException
 from smartcard.Exceptions import CardConnectionException
 
+HOST = 'localhost'
+PORT = 51000
+
+MAX_MESSAGE = 2048
+NUM_THREAD = 4
+
+CHR_CAN = '\18'
+CHR_EOT = '\04'
+
+cuiroot = tkinter.Tk()
+
+cuiroot.title("STSS Control Panel")
+cuiroot.geometry("1000x600") 
+
 box_cell_num = 6
 machine_ID = 1
+
+receive_data = 0
+
+def com_send(mess):
+    while True:
+        try:
+            # 通信の確立
+            sock = socket.socket(AF_INET, SOCK_STREAM)
+            sock.connect((HOST, PORT))
+            
+            # メッセージ送信
+            sock.send(mess.encode('utf-8'))
+            
+            # 通信の終了
+            sock.close()
+            break
+        
+        except:
+            print ('retry: ' + mess)
 
 # define the APDUs used in this script
 SELECT = [0x00, 0xA4, 0x04, 0x00, 0x0A, 0xA0, 0x00, 0x00, 0x00, 0x62,
@@ -23,10 +61,19 @@ r = readers()
 
 reader = r[0]
 
-print("タグをタッチしてください")
+#print("タグをタッチしてください")
+com_send('stand')
+sock = socket(AF_INET, SOCK_STREAM)
+sock.bind ((HOST, PORT))
+sock.listen (NUM_THREAD)
+#print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
+
 
 flag = True
 while True:
+    conn,addr = sock.accept()
+    mess = conn.recv(MAX_MESSAGE).decode('utf-8')
+    conn.close()
     
     cell_ID   = []
     serial_ID = []
@@ -71,10 +118,12 @@ while True:
                         
                             
             if first_five_chars == "user.":
+                com_send('tool_extract')
                
                  ##取り出し動作
-                print("何番の工具を取り出しますか？")
-                input_number = input("数値を入力してください: ")
+                #print("何番の工具を取り出しますか？")
+
+                input_number = mess #input("数値を入力してください: ")
                 for i in range(len(serial_ID)):
                     if serial_ID[i] == input_number:  
                         serial_ID[i] = -1
@@ -84,13 +133,18 @@ while True:
                             if row[0] == input_number:
                                 row[4] = username
                                 row[3] = "using" 
-                        
-                    
-                ## ここに取り出し処理
                 
             else:
                 ##格納動作
+                com_send('return')
+                cell_count = 0
                 for i in range(len(cell_ID)):
+                    cell_count += 1
+                    if cell_count >= box_cell_num:
+                        print("ボックスがいっぱいです")
+                        com_send('box_full')
+                        break
+
                     if serial_ID[i] == "-1" :
                         serial_ID[i] = string
                         print("cell_ID: ",cell_ID[i],"に格納します")    
@@ -100,8 +154,7 @@ while True:
                                 row[3] = machine_ID
                         ## ここに格納処理
                         break               
-                else:
-                    print("ボックスがいっぱいです") 
+                     
                         
             ##manage.csvから情報を取得してstate.csvの工具情報を更新    
                 
@@ -135,12 +188,14 @@ while True:
         if flag == False:
             #print("Not found1")
             flag = True
+            com_send('stand')
             print("タグをタッチしてください")
         
     except CardConnectionException:
         if flag == False:
             #print("Not found2")
             flag = True
+            com_send('stand')
             print("タグをタッチしてください")
        
     except IndexError:
@@ -148,3 +203,4 @@ while True:
             #print("Read Error")
             flag = True
 
+sock.close()
