@@ -1,0 +1,2 @@
+・SCS_ENDはエンディアンの指定
+・INSTはinstruction（コマンド）
