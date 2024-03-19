@@ -6,6 +6,8 @@ ADDR_SCS_GOAL_POSITION     = 42
 ADDR_SCS_GOAL_SPEED        = 46
 ADDR_SCS_PRESENT_POSITION  = 56
 
+ADDR_SCS_MODE = 33
+
 import os
 import sys, tty, termios
 
@@ -84,7 +86,14 @@ class mySTS:
         else:
             print("[ID:%03d] ping Succeeded. SCServo model number : %d" % (self.SCS_ID, scs_model_number))
     
-    def move_absolute(self,acc,speed,position):
+    def wheelmode(self,mode):
+        scs_comm_result, scs_error = packetHandler.write1ByteTxRx(portHandler, self.SCS_ID, ADDR_SCS_MODE, mode)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % packetHandler.getRxPacketError(scs_error))
+
+    def move_absolute_pos(self,acc,speed,position):
         # Write SCServo acc
         scs_comm_result, scs_error = packetHandler.write1ByteTxRx(portHandler, self.SCS_ID, ADDR_SCS_GOAL_ACC, acc)
         if scs_comm_result != COMM_SUCCESS:
@@ -105,6 +114,28 @@ class mySTS:
             print("%s" % packetHandler.getTxRxResult(scs_comm_result))
         elif scs_error != 0:
             print("%s" % packetHandler.getRxPacketError(scs_error))
+    
+    def move_speed(self,acc,speed):
+        # Write SCServo acc
+        scs_comm_result, scs_error = packetHandler.write1ByteTxRx(portHandler, self.SCS_ID, ADDR_SCS_GOAL_ACC, acc)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % packetHandler.getRxPacketError(scs_error))
+
+        _speed_ = speed
+        # Write SCServo speed
+        if speed<0 :
+            _speed_ = -speed
+            _speed_ |= (1<<15)
+	    
+        scs_comm_result, scs_error = packetHandler.write2ByteTxRx(portHandler, self.SCS_ID, ADDR_SCS_GOAL_SPEED, _speed_)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % packetHandler.getRxPacketError(scs_error))
+
+
 
 def close():
     global portHandler,packetHandler
