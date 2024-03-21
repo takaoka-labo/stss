@@ -33,6 +33,17 @@ sock = socket(AF_INET, SOCK_STREAM)
 sock.connect((HOST, PORT))
 #sock.listen (NUM_THREAD)
 
+def com_receive():
+    while True:
+        try:
+            mess = sock.recv(MAX_MESSAGE).decode('utf-8')
+            #print(mess)
+        except:
+            print("non signal")
+            continue
+        
+    #conn.close()
+    
 def com_send(mess):
     while True:
             # 通信の確立
@@ -41,13 +52,16 @@ def com_send(mess):
         #sock.connect((HOST, PORT))
             
             # メッセージ送信
-        sock.send(mess.encode('utf-8'))
+        try:
+            sock.send(mess.encode('utf-8'))
             
             # 通信の終了
-        sock.close()
-        break
+            #sock.close()
+            break
         
-        #except:
+        except:
+            pass
+            #sock.close()
             #print ('retry: ' + mess)
 
 # define the APDUs used in this script
@@ -66,7 +80,8 @@ r = readers()
 reader = r[0]
 
 print("タグをタッチしてください")
-com_send('stand')
+#com_send('tool_extract')
+
 print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
 
 #conn,addr = sock.accept()
@@ -74,12 +89,9 @@ print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
 #mess = conn.recv(MAX_MESSAGE).decode('utf-8')
 #conn.close()
     
+mess = ''
 flag = True
 while True:
-    #conn,addr = sock.accept()
-    #print("test")
-    mess = sock.recv(MAX_MESSAGE).decode('utf-8')
-    #conn.close()
     
     cell_ID   = []
     serial_ID = []
@@ -91,7 +103,6 @@ while True:
         #sock = socket(AF_INET, SOCK_STREAM)
         #sock.bind ((HOST, PORT))
         #sock.listen (NUM_THREAD)
-
         connection = reader.createConnection()
         connection.connect()
 
@@ -129,8 +140,10 @@ while True:
                
                  ##取り出し動作
                 print("何番の工具を取り出しますか？")
-
+                com_receive()
                 input_number = mess #input("数値を入力してください: ")
+                
+                print(input_number)
                 for i in range(len(serial_ID)):
                     if serial_ID[i] == input_number:  
                         serial_ID[i] = -1
@@ -189,6 +202,7 @@ while True:
             with open('log.csv', 'a', newline='') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow([string, current_time,])
+        
         sock.close()
 
     except NoCardException:

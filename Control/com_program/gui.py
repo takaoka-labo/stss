@@ -37,9 +37,11 @@ def com_receive():
     #sock.listen (NUM_THREAD)
     print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
     while True:
+        #sock.send("test")
         try:
             conn,addr = sock.accept()
             mess = conn.recv(MAX_MESSAGE).decode('utf-8')
+            print(mess)
 
             #conn.close()
             if(mess == CHR_EOT):
@@ -48,6 +50,7 @@ def com_receive():
             if(mess == CHR_CAN):
                 continue
 
+            print(mess)
             if(mess == 'tool_extract'):
                 print("index")
                 df = pd.read_csv('state.csv',header=None)
@@ -96,15 +99,16 @@ def com_start():
     th=threading.Thread(target=com_receive)
     th.start()
 
-def send_button_text(text,con):
+def send_button_text(text,soc):
     #sock = socket(AF_INET, SOCK_STREAM)
     #sock.connect((HOST, PORT))
-    con.send(text.encode('utf-8'))
-    con.close()
+    soc.send(text.encode('utf-8'))
+    soc.close()
+    #print("tetete")
 
-def create_button(num,text,con):
+def create_button(num,text,soc):
     Font = ("MSゴシック", 18, "bold")
-    button = tkinter.Button(cuiroot, text=text,height=3, width=7, font=Font,command=lambda: send_button_text(num,con))
+    button = tkinter.Button(cuiroot, text=text,height=3, width=7, font=Font,command=lambda: send_button_text(num,soc))
     buttons[text] = button
     return button
 
