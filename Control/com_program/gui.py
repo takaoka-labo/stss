@@ -23,20 +23,25 @@ cuiroot.geometry("1000x800")
 var1 = tkinter.StringVar()
 
 buttons = {}
-
+#global sock
+    
+sock = socket(AF_INET, SOCK_STREAM)
+sock.bind ((HOST, PORT))
+sock.listen (NUM_THREAD)
+    
 def com_receive():
     #global sock
     
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.bind ((HOST, PORT))
-    sock.listen (NUM_THREAD)
+    #sock = socket(AF_INET, SOCK_STREAM)
+    #sock.bind ((HOST, PORT))
+    #sock.listen (NUM_THREAD)
     print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
     while True:
         try:
             conn,addr = sock.accept()
             mess = conn.recv(MAX_MESSAGE).decode('utf-8')
 
-            conn.close()
+            #conn.close()
             if(mess == CHR_EOT):
                 break
             
@@ -56,7 +61,7 @@ def com_receive():
                 '''
                 # ボタンを作成
                 for index, row in df.iterrows():
-                    button = create_button(str(row.iloc[1]),str(row.iloc[2]))
+                    button = create_button(str(row.iloc[1]),str(row.iloc[2]),conn)
                     button.place(x=10 + index * 150, y=300)  # ボタンの位置を調整
                     buttons[str(row.iloc[2])] = button
             '''
@@ -77,10 +82,11 @@ def com_receive():
             
             if(mess == 'return'):
                 message('Setting storage location...')
-
+            
+            conn.close()
         except:
             print('Error')
-    sock.close()
+    #sock.close()
 
 def message(mes):
     var1.set(mes)
@@ -90,15 +96,15 @@ def com_start():
     th=threading.Thread(target=com_receive)
     th.start()
 
-def send_button_text(text):
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect((HOST, PORT))
-    sock.send(text.encode('utf-8'))
-    sock.close()
+def send_button_text(text,con):
+    #sock = socket(AF_INET, SOCK_STREAM)
+    #sock.connect((HOST, PORT))
+    con.send(text.encode('utf-8'))
+    con.close()
 
-def create_button(num,text):
+def create_button(num,text,con):
     Font = ("MSゴシック", 18, "bold")
-    button = tkinter.Button(cuiroot, text=text,height=3, width=7, font=Font,command=lambda: send_button_text(num))
+    button = tkinter.Button(cuiroot, text=text,height=3, width=7, font=Font,command=lambda: send_button_text(num,con))
     buttons[text] = button
     return button
 

@@ -29,22 +29,26 @@ machine_ID = 1
 
 receive_data = 0
 
+sock = socket(AF_INET, SOCK_STREAM)
+sock.connect((HOST, PORT))
+#sock.listen (NUM_THREAD)
+
 def com_send(mess):
     while True:
-        try:
             # 通信の確立
-            sock = socket.socket(AF_INET, SOCK_STREAM)
-            sock.connect((HOST, PORT))
+            #sock = socket(AF_INET, SOCK_STREAM)
+            #conn,addr = sock.accept()
+        #sock.connect((HOST, PORT))
             
             # メッセージ送信
-            sock.send(mess.encode('utf-8'))
+        sock.send(mess.encode('utf-8'))
             
             # 通信の終了
-            sock.close()
-            break
+        sock.close()
+        break
         
-        except:
-            print ('retry: ' + mess)
+        #except:
+            #print ('retry: ' + mess)
 
 # define the APDUs used in this script
 SELECT = [0x00, 0xA4, 0x04, 0x00, 0x0A, 0xA0, 0x00, 0x00, 0x00, 0x62,
@@ -61,19 +65,21 @@ r = readers()
 
 reader = r[0]
 
-#print("タグをタッチしてください")
+print("タグをタッチしてください")
 com_send('stand')
-sock = socket(AF_INET, SOCK_STREAM)
-sock.bind ((HOST, PORT))
-sock.listen (NUM_THREAD)
-#print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
+print ('receiver ready, NUM_THREAD = ' + str(NUM_THREAD))
 
-
+#conn,addr = sock.accept()
+#print("test")
+#mess = conn.recv(MAX_MESSAGE).decode('utf-8')
+#conn.close()
+    
 flag = True
 while True:
-    conn,addr = sock.accept()
-    mess = conn.recv(MAX_MESSAGE).decode('utf-8')
-    conn.close()
+    #conn,addr = sock.accept()
+    #print("test")
+    mess = sock.recv(MAX_MESSAGE).decode('utf-8')
+    #conn.close()
     
     cell_ID   = []
     serial_ID = []
@@ -82,6 +88,9 @@ while True:
     
     #time.sleep(2)   
     try: # Attempt to connect to the card
+        #sock = socket(AF_INET, SOCK_STREAM)
+        #sock.bind ((HOST, PORT))
+        #sock.listen (NUM_THREAD)
 
         connection = reader.createConnection()
         connection.connect()
@@ -92,8 +101,7 @@ while True:
         data_size = data_01[1] - 6
         
         if flag == True:
-            
-            
+                        
             flag = False
             extracted_bytes = data[1:data_size]
             ascii_chars = [chr(byte) for byte in extracted_bytes]
@@ -101,7 +109,6 @@ while True:
             print(string)
             first_five_chars = string[:5]
             username = string[5:]
-            
             
             with open('state.csv', 'r') as f:
                 csv_reader = csv.reader(f)
@@ -121,7 +128,7 @@ while True:
                 com_send('tool_extract')
                
                  ##取り出し動作
-                #print("何番の工具を取り出しますか？")
+                print("何番の工具を取り出しますか？")
 
                 input_number = mess #input("数値を入力してください: ")
                 for i in range(len(serial_ID)):
@@ -182,7 +189,8 @@ while True:
             with open('log.csv', 'a', newline='') as f:
                 csv_writer = csv.writer(f)
                 csv_writer.writerow([string, current_time,])
-                
+        sock.close()
+
     except NoCardException:
         # If no card is found, print a message and continue the loop
         if flag == False:
@@ -203,4 +211,4 @@ while True:
             #print("Read Error")
             flag = True
 
-sock.close()
+#sock.close()
