@@ -23,11 +23,14 @@ gui_com = 0 #ボタンの入力を受け取る変数
 gui_event = 0 #guiのページの指定 0:"タグをかざしてください" 1:"取り出すものを選択してください"[在庫分のボタンを表示] 2:"取り出し中"[ボタンを消す] 3:"取り出してください" 4:"格納セル待ち" 5:返却してください 6:"ボックスがいっぱいです"
 
 def gui_main():
+    print('in')
+    global gui_event
+    global disp_text
     if gui_event == 0:
-        disp_text.set("タグをかざしてください")
+        #disp_text.set("タグをかざしてください")
         button_disappear()
     elif gui_event == 1:
-        disp_text.set("取り出すものを選択してください")
+        #disp_text.set("取り出すものを選択してください")
         button_appear()
     elif gui_event == 2:
         disp_text.set("取り出し中")
@@ -40,7 +43,7 @@ def gui_main():
     elif gui_event == 6:
         disp_text.set("ボックスがいっぱいです")
 
-    cuiroot.mainloop() 
+    #cuiroot.mainloop() 
 
 def button_appear():
     #state.csvの情報を読む
@@ -65,8 +68,10 @@ def gui_start():
     #別スレッドで待ち受け
     thread_gui = threading.Thread(target=gui_main)
     thread_gui.start()
+    cuiroot.mainloop()
 
 def button_num(num):
+    global gui_com
     gui_com = num
 
 def create_button(num,text):
@@ -89,6 +94,8 @@ label1.place(x=10,y=10)
 
 
 def base_sys():
+    global gui_com
+    global gui_event
     box_cell_num = 6
     machine_ID = 1
 
@@ -162,6 +169,7 @@ def base_sys():
                     #guiのボタンを発生させる
                     gui_event = 1 #1:"取り出すものを選択してください"[在庫分のボタンを表示]
                     #guiの入力があるまで待つ
+                    print(gui_event)
                     while True:
                         if gui_com != 0:
                             break   
@@ -270,5 +278,5 @@ def base_sys():
 thread_base = threading.Thread(target=base_sys)
 gui_start()
 thread_base.start()
-
+#cuiroot.mainloop()
 
