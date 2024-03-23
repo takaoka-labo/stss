@@ -23,9 +23,6 @@ stss_gui.main_function.append(('main_menu',main_menu))
 def deposit(USER_NAME):
     stss_gui.Draw_Page()
     stss_gui.Arrange_ToolButton()
-    #wait button_push
-    while 1:
-        pass
 
 stss_gui.main_function.append(('deposit',deposit))
 
