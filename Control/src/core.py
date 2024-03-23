@@ -1,5 +1,5 @@
-from stss_nfc.stss_nfc import *
-import stss_gui
+#from .stss_nfc import *
+import stss_gui, stss_nfc, stss_motor
 import tkinter
 
 func_mode_debug = 1
@@ -35,7 +35,7 @@ def withdraw(root,phase,USER_NAME,cell_num = None):
     if phase == 0:
         stss_gui.Draw_Page(root,1)
         stss_gui.Arrange_ToolButton(root)
-        stss_gui.wait_push(root,'tool_select',withdraw,phase,USER_NAME)
+        stss_gui.wait_push(root,stss_gui.TOOL_SELECT,withdraw,phase,USER_NAME)
 
     elif phase == 1:
         print('selected : ' + str(cell_num))
@@ -55,23 +55,40 @@ def withdraw(root,phase,USER_NAME,cell_num = None):
         #finish
         current_page = 0
 
-stss_gui.flags['tool_select'] = (False,None)
+stss_gui.flags[stss_gui.TOOL_SELECT] = (False,None)
 stss_gui.main_function.append(('withdraw',withdraw))
 
 #main function : 2
-def deposit(SERIAL_NUMBER):
-    #実装
-    #
-    #
-    pass
+def deposit(root,phase,SERIAL_NUMBER):
+    if phase == 0:
+        stss_gui.Draw_Page(root,1)
+        
+        #CLI更新
 
-stss_gui.flags['finish_deposit'] = (False,None)
+        #state.csvからcell_num取得
+
+        #回転
+
+        #CLI更新
+
+        #ドア開く
+
+        #ボタン表示
+
+        #GUI操作待ち
+        stss_gui.wait_push(root,stss_gui.FINISH_DEPOSIT,deposit,phase,SERIAL_NUMBER)
+    elif phase == 1:
+        #管理ファイル更新
+        
+        #finish
+        current_page = 0
+
+stss_gui.flags[stss_gui.FINISH_DEPOSIT] = (False,None)
 stss_gui.main_function.append(('deposit',deposit))
 
 
-
 #machine setting
-nfc = nfcReader()
+nfc = stss_nfc.nfcReader()
 
 root = tkinter.Tk()
 #
