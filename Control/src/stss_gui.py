@@ -26,7 +26,7 @@ def Arrange_ToolButton(root):
         button.place(x=10 + index * 150, y=300)  # ボタンの位置を調整
         button.pack()
         buttons[str(row.iloc[2])] = button
-    print('debug arrange_toolbutton')
+    #print('debug arrange_toolbutton')
     root.update()
 
 def create_button(root,num,text,next_page = None,flag_name = None):

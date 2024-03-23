@@ -2,7 +2,7 @@ import mySTS,time
 
 # parameter for revolver
 revolver_pos = [0,682,1365,2047,2730,3412]
-renolver_pos_offset = 0;
+renolver_pos_offset = 0
 revolver_acc = 50
 revolver_speed = 6000
 position_time = 2 # [s]

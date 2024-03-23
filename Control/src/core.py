@@ -14,11 +14,13 @@ def main_menu(root):
     nfc_detected = nfc.connect()
     #func_mode = function_number
     if nfc_detected:
+        
+        NFC_TYPE,string = nfc.get_data()
         #degugging
-        func_mode = int(input('enter function_number'))
-        #arg = argument
-        arg = NFC_arg_debug
-
+        #func_mode = int(input('enter function_number'))
+        func_mode = NFC_TYPE
+        #arg = NFC_arg_debug
+        arg = string
         current_page = func_mode
         stss_gui.main_function[func_mode][1](root,0,arg) # start each function from phase : 0
     else:
@@ -27,13 +29,13 @@ def main_menu(root):
 stss_gui.main_function.append(('main_menu',main_menu))
 
 #main function : 1
-def deposit(root,phase,USER_NAME,cell_num = None):
+def withdraw(root,phase,USER_NAME,cell_num = None):
     global current_page
-    print('deposit : phase ' + str(phase))
+    print('withdraw : phase ' + str(phase))
     if phase == 0:
         stss_gui.Draw_Page(root,1)
         stss_gui.Arrange_ToolButton(root)
-        stss_gui.wait_push(root,'tool_select',deposit,phase,USER_NAME)
+        stss_gui.wait_push(root,'tool_select',withdraw,phase,USER_NAME)
 
     elif phase == 1:
         print('selected : ' + str(cell_num))
@@ -54,16 +56,17 @@ def deposit(root,phase,USER_NAME,cell_num = None):
         current_page = 0
 
 stss_gui.flags['tool_select'] = (False,None)
-stss_gui.main_function.append(('deposit',deposit))
+stss_gui.main_function.append(('withdraw',withdraw))
 
 #main function : 2
-def withdraw(SERIAL_NUMBER):
+def deposit(SERIAL_NUMBER):
     #実装
     #
     #
     pass
 
-stss_gui.main_function.append(('withdraw',withdraw))
+stss_gui.flags['finish_deposit'] = (False,None)
+stss_gui.main_function.append(('deposit',deposit))
 
 
 
@@ -71,11 +74,9 @@ stss_gui.main_function.append(('withdraw',withdraw))
 nfc = nfcReader()
 
 root = tkinter.Tk()
-
 #
 #
 #
-
 stss_gui.Draw_Page(root,0)
 
 root.after(100,main_menu,root)
