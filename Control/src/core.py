@@ -14,7 +14,6 @@ def main_menu(root):
     nfc_detected = nfc.connect()
     #func_mode = function_number
     if nfc_detected:
-        
         NFC_TYPE,string = nfc.get_data()
         #degugging
         #func_mode = int(input('enter function_number'))

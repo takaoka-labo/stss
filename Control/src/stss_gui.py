@@ -29,7 +29,6 @@ def Arrange_ToolButton(root):
     for index, row in df.iterrows():
         button = create_button(root, str(row.iloc[1]), str(row.iloc[2]), next_page = None, flag_name = 'tool_select')
         button.place(x=10 + index * 150, y=300)  # ボタンの位置を調整
-        button.pack()
         buttons[str(row.iloc[2])] = button
     #print('debug arrange_toolbutton')
     root.update()
