@@ -1,8 +1,7 @@
-import os
-import sys
-sys.path.append(os.pardir)
-print(sys.path)
-import mySTS
+if __name__ == "__main__":
+    import mySTS
+else:
+    from . import mySTS
 import time
 
 # parameter for revolver

@@ -1,9 +1,11 @@
 #from .stss_nfc import *
-import stss_gui, stss_nfc, stss_motor
+import stss_gui, stss_nfc, stss_motor, stss_csv
 import tkinter
 
 func_mode_debug = 1
 NFC_arg_debug = 'nishiyama'
+
+csv_master = stss_csv.csv_manager()
 
 #main function : 0
 def main_menu(root):
@@ -31,8 +33,8 @@ stss_gui.main_function.append(('main_menu',main_menu))
 def withdraw(root,phase,USER_NAME,cell_num = None):
     global current_page
     print('withdraw : phase ' + str(phase))
+    frame = stss_gui.Draw_Page(root,1)
     if phase == 0:
-        stss_gui.Draw_Page(root,1)
         stss_gui.Arrange_ToolButton(root)
         stss_gui.wait_push(root,stss_gui.TOOL_SELECT,withdraw,phase,USER_NAME)
 
@@ -40,9 +42,12 @@ def withdraw(root,phase,USER_NAME,cell_num = None):
         print('selected : ' + str(cell_num))
 
         #CLI更新
+        stss_gui.gui[stss_gui.P1_CLI].update_text('please waite...')
+        
 
         #ボタン非表示
-
+        stss_gui.destroy_button(frame)
+        
         #回転
 
         #ドア開く
@@ -50,6 +55,8 @@ def withdraw(root,phase,USER_NAME,cell_num = None):
         #待機
 
         #管理ファイル更新
+        csv_master.update_state()
+        csv_master.update_manage()
 
         #finish
         current_page = 0
@@ -61,24 +68,31 @@ stss_gui.main_function.append(('withdraw',withdraw))
 def deposit(root,phase,SERIAL_NUMBER):
     global current_page
     if phase == 0:
-        stss_gui.Draw_Page(root,1)
+        frame = stss_gui.Draw_Page(root,2)
         
         #CLI更新
+        stss_gui.gui[stss_gui.P2_CLI].update_text('please wait...')
 
         #state.csvからcell_num取得
-
+        csv_master.get_state()
+        csv_master.get_manage()
+        
         #回転
 
         #CLI更新
-
+        stss_gui.gui[stss_gui.P2_CLI].update_text('open')
+        
         #ドア開く
 
         #ボタン表示
-
+        stss_gui.check_button(root)
+        
         #GUI操作待ち
         stss_gui.wait_push(root,stss_gui.FINISH_DEPOSIT,deposit,phase,SERIAL_NUMBER)
     elif phase == 1:
         #管理ファイル更新
+        stss_csv.update_state()
+        stss_csv.update_manage()
 
         #finish
         current_page = 0
@@ -93,8 +107,8 @@ stss_motor.setting('/dev/ttyUSB0')
 
 ### mainloop
 root = tkinter.Tk()
-#
-#
+root.title('STSS - Smart Tool Strage System -')
+root.geometry('500x400')
 #
 stss_gui.Draw_Page(root,0)
 root.after(100,main_menu,root)

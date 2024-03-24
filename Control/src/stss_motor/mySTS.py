@@ -1,7 +1,10 @@
 import os
 import sys, tty, termios
-sys.path.append(os.pardir)
-from scservo_sdk import *                # Uses SCServo SDK library
+if __name__ == "__main__":
+    from scservo_sdk import *                # Uses SCServo SDK library
+else:
+    from .scservo_sdk import *
+
 # Control table address
 ADDR_SCS_TORQUE_ENABLE     = 40
 ADDR_SCS_GOAL_ACC          = 41
