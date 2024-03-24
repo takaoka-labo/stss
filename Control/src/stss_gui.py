@@ -6,6 +6,11 @@ main_function = []
 
 buttons = {}
 flags = {}
+#flag tags
+TOOL_SELECT = 'tool_select'
+FINISH_DEPOSIT = 'finish_deposit'
+
+
 after_id = None
 
 def button_on(num,next_page,flag_name):

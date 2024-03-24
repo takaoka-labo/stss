@@ -60,6 +60,7 @@ stss_gui.main_function.append(('withdraw',withdraw))
 
 #main function : 2
 def deposit(root,phase,SERIAL_NUMBER):
+    global current_page
     if phase == 0:
         stss_gui.Draw_Page(root,1)
         
@@ -79,7 +80,7 @@ def deposit(root,phase,SERIAL_NUMBER):
         stss_gui.wait_push(root,stss_gui.FINISH_DEPOSIT,deposit,phase,SERIAL_NUMBER)
     elif phase == 1:
         #管理ファイル更新
-        
+
         #finish
         current_page = 0
 
@@ -89,14 +90,16 @@ stss_gui.main_function.append(('deposit',deposit))
 
 #machine setting
 nfc = stss_nfc.nfcReader()
+stss_motor.setting('/dev/ttyUSB0')
 
+### mainloop
 root = tkinter.Tk()
 #
 #
 #
 stss_gui.Draw_Page(root,0)
-
 root.after(100,main_menu,root)
-
-print('start')
 root.mainloop()
+###
+
+stss_motor.close()

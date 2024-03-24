@@ -1,3 +1,6 @@
+import os
+import sys, tty, termios
+sys.path.append(os.pardir)
 from scservo_sdk import *                # Uses SCServo SDK library
 # Control table address
 ADDR_SCS_TORQUE_ENABLE     = 40
@@ -7,9 +10,6 @@ ADDR_SCS_GOAL_SPEED        = 46
 ADDR_SCS_PRESENT_POSITION  = 56
 
 ADDR_SCS_MODE = 33
-
-import os
-import sys, tty, termios
 
 if os.name == 'nt':
         import msvcrt
@@ -124,12 +124,16 @@ class mySTS:
             print("%s" % packetHandler.getRxPacketError(scs_error))
 
         _speed_ = speed
+        
         # Write SCServo speed
         if speed<0 :
             _speed_ = -speed
+            print(_speed_)
+            print(_speed_.to_bytes(2))
             _speed_ |= (1<<15)
-	    
+        
         scs_comm_result, scs_error = packetHandler.write2ByteTxRx(portHandler, self.SCS_ID, ADDR_SCS_GOAL_SPEED, _speed_)
+        print(_speed_)
         if scs_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(scs_comm_result))
         elif scs_error != 0:
@@ -139,3 +143,17 @@ def close():
     global portHandler,packetHandler
     # Close port
     portHandler.closePort()
+
+if __name__ == "__main__":
+    import mySTS,time
+
+    DEVICENAME = '/dev/ttyUSB0'
+    prepare_STS()
+
+    servo = mySTS(1,1000000)
+    servo.wheelmode(1)
+    #servo.move_absolute_pos(100,1000,0) #0.acceralation 1.speed 2.position
+    servo.move_speed(100,4096) #0.acceralation 1.speed
+    time.sleep(1)
+    servo.move_speed(50,0) #0.acceralation 1.speed
+    close()
