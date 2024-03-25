@@ -10,6 +10,10 @@ class csv_manager:
         self.manage_data = []
         
     def get_state(self):
+        self.cell_ID.clear()
+        self.serial_ID.clear()
+        self.tool_name.clear() 
+        self.tool_size.clear()
         with open('state.csv', 'r') as f:
             csv_reader = csv.reader(f)
             for row in csv_reader:
@@ -31,14 +35,19 @@ class csv_manager:
             csv_writer = csv.writer(f)
             for i in range(len(self.cell_ID)) :
                 csv_writer.writerow([self.cell_ID[i], self.serial_ID[i], self.tool_name[i], self.tool_size[i]])
-        return self.cell_ID, self.serial_ID, self.tool_name, self.tool_size
+            print(self.cell_ID, self.serial_ID, self.tool_name, self.tool_size)
+        self.cell_ID.clear()
+        self.serial_ID.clear()
+        self.tool_name.clear() 
+        self.tool_size.clear()
+            
     
     def update_manage(self):
         with open('manage.csv', 'w', newline='') as file:
             csv_writer = csv.writer(file)
             csv_writer.writerows(self.manage_data)
             print(self.manage_data)
-        return self.manage_data
+        self.manage_data.clear()
     
     def update_withdraw(self, input_number, username):#input_numberは取り出す工具のシリアルID
         self.get_state()
@@ -73,6 +82,7 @@ class csv_manager:
                     if row[0] == string:
                         #row[4] = username
                         row[3] = 1 #machine_ID #とりあえず今は1
+                break
         self.update_state()
         self.update_manage()
     

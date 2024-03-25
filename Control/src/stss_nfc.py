@@ -57,4 +57,5 @@ class nfcReader:
         #print(string)
         tmp = string.split(',')
         NFC_TYPE = int(tmp[0])
+        print('temp[1] = ',tmp[1])
         return NFC_TYPE,tmp[1]
