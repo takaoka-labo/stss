@@ -82,6 +82,12 @@ class csv_manager:
                         #row[4] = username
                         row[3] = 1 #machine_ID #とりあえず今は1
                 break
+            
+        for i in range(len(self.serial_ID)) :
+            for row in self.manage_data :
+                if self.serial_ID[i] == row[0]:
+                    self.tool_name[i] = row[1]
+                    self.tool_size[i] = row[2]
         self.update_state()
         self.update_manage()
     
