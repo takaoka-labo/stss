@@ -50,11 +50,14 @@ def withdraw(root,phase,*arg): # 0:USER_NAME 1:cell_num
         stss_gui.gui[stss_gui.P1_BUTTON_ARRAY].destroy()
         
         #回転
+        revolver.position(int(arg[0][1]) - 1)
 
         #ドア開く
+        door.open()
 
         #待機
         time.sleep(1)
+        door.close()
 
         #管理ファイル更新
         #print(USER_NAME[0])
@@ -79,12 +82,15 @@ def deposit(root,phase,*arg): # 0:SERIAL_NUMBER
         #state.csvからcell_num取得
         cell_num = csv_master.search_vacant_cell()
         print(cell_num)
+
         #回転
+        revolver.position(cell_num - 1)
 
         #CLI更新
         stss_gui.gui[stss_gui.P2_CLI].update_text(tkinter.END,'\nopen')
         
         #ドア開く
+        door.open()
 
         #ボタン表示
         stss_gui.check_button(root)
@@ -94,6 +100,7 @@ def deposit(root,phase,*arg): # 0:SERIAL_NUMBER
     elif phase == 1:
         #管理ファイル更新
         print(arg)
+        door.close()
         csv_master.update_deposite(arg[0][0])
 
         #finish
@@ -106,6 +113,8 @@ stss_gui.main_function.append(('deposit',deposit))
 #machine setting
 nfc = stss_nfc.nfcReader()
 stss_motor.setting('/dev/ttyUSB0')
+revolver = stss_motor.revolver(1,1000000)
+door = stss_motor.door(2,1000000)
 
 ### mainloop
 root = tkinter.Tk()
