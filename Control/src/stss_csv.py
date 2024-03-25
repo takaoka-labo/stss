@@ -77,7 +77,6 @@ class csv_manager:
         for i in range(len(self.cell_ID)):
             if self.serial_ID[i] == "-1" :
                 self.serial_ID[i] = string
-                cell_id = i                                                                     #????????????????????
                 for row in self.manage_data:
                     if row[0] == string:
                         #row[4] = username
