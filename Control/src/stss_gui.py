@@ -25,13 +25,15 @@ P2_CHECK_BUTTON = 'p2_check_button'
 #GUI designs
 CLI_BG = "#101010"
 
+cancel = 'CANCEL'
+
 after_id = None
 
-def button_on(num,next_page,flag_name):
+def button_on(arg,next_page,flag_name):
     global current_page
-    print('pushed ' + num)
+    print('pushed ' + arg)
     current_page = next_page if next_page != None else current_page
-    flags[flag_name] = (True,num) if flags[flag_name][0] != None else flags[flag_name]
+    flags[flag_name] = (True,arg) if flags[flag_name][0] != None else flags[flag_name]
 
 def Arrange_ToolButton(root):
     global gui
@@ -45,11 +47,17 @@ def Arrange_ToolButton(root):
     # 読み込んだ情報をもとに取り出し用のボタンを作成
     for index, row in df.iterrows():
         button = create_button(button_panel, str(row.iloc[0]), str(row.iloc[2]), next_page = None, flag_name = TOOL_SELECT)
-        button.place(x=10 + index * 30, y=0)  # ボタンの位置を調整
+        button.pack(side=tkinter.LEFT,padx = 5,pady=5)  # ボタン配置
         buttons[str(row.iloc[2])] = button
     #print('debug arrange_toolbutton')
-    button_panel.place(x=0, y=100)
+    button_panel.pack()
     #button_panel.pack()
+    root.update()
+
+def cancel_button(root,flag_name):
+    button = create_button(root, cancel, 'cancel', next_page = None, flag_name = flag_name)
+    button.pack(padx = 5,pady=5)  # ボタン配置
+    buttons['cancel'] = button
     root.update()
 
 def create_button(button_panel,num,text,next_page = None,flag_name = None):
@@ -68,7 +76,7 @@ def check_button(root):
     Font = ("MSゴシック", 18, "bold")
     button = tkinter.Button(root, text='check',height=3, width=7, font=Font,command=lambda: button_on('check',next_page = None,flag_name = FINISH_DEPOSIT))##フラグ処理？
     gui[P2_CHECK_BUTTON] = button
-    button.place(x=0, y=100)
+    button.pack(pady=5)
 
 def Draw_Page(root,page_num):
     global gui

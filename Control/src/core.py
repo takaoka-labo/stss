@@ -18,7 +18,7 @@ def main_menu(root):
     #func_mode = function_number
     if nfc_detected:
         try:
-            NFC_TYPE,string = nfc.get_data()
+            NFC_TYPE,string = nfc.get_data_v2()
             #print(string)
             #degugging
             #func_mode = int(input('enter function_number'))
@@ -41,31 +41,37 @@ def withdraw(root,phase,*arg): # 0:USER_NAME 1:cell_num
     if phase == 0:
         stss_gui.Draw_Page(root,1)
         stss_gui.Arrange_ToolButton(root)
+        stss_gui.cancel_button(root,stss_gui.TOOL_SELECT)
         stss_gui.wait_push(root,stss_gui.TOOL_SELECT,withdraw,phase,arg[0])
 
     elif phase == 1:
         print(arg[0])
-        print('selected cell_ID: ' + str(arg[0][1]))
+        if arg[0][1] != stss_gui.cancel:
 
-        #CLI更新
-        stss_gui.gui[stss_gui.P1_CLI].update_text(0.,'please wait...')
+            print('selected cell_ID: ' + str(arg[0][1]))
+            #CLI更新
+            stss_gui.gui[stss_gui.P1_CLI].update_text(0.,'please wait...')
 
-        #ボタン非表示
-        stss_gui.gui[stss_gui.P1_BUTTON_ARRAY].destroy()
-        
-        #回転
-        revolver.position(int(arg[0][1]) - 1)
+            #ボタン非表示
+            stss_gui.gui[stss_gui.P1_BUTTON_ARRAY].destroy()
+            
+            #回転
+            revolver.position(int(arg[0][1]) - 1)
 
-        #ドア開く
-        door.open()
+            #ドア開く
+            door.open()
 
-        #待機
-        time.sleep(1)
-        door.close()
+            #待機
+            time.sleep(5)
+            door.close()
 
-        #管理ファイル更新
-        #print(USER_NAME[0])
-        csv_master.update_withdraw(arg[0][0],int(arg[0][1]) - 1)
+            #管理ファイル更新
+            #print(USER_NAME[0])
+            csv_master.update_withdraw(arg[0][0],int(arg[0][1]) - 1)
+
+        else:
+            #ボタン非表示
+            stss_gui.gui[stss_gui.P1_BUTTON_ARRAY].destroy()
 
         #finish
         stss_gui.return_main_menu(root)

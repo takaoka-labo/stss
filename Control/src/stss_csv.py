@@ -66,7 +66,7 @@ class csv_manager:
             if row[0] == serial_id:
                 row[4] = username
                 row[3] = "using" 
-                
+        
         self.update_state()
         self.update_manage()
         
@@ -77,17 +77,17 @@ class csv_manager:
                 return i
         return -1
         
-    def update_deposit(self, string,cell_num):
+    def update_deposit(self, serial_num,cell_num):
         self.get_state()
         self.get_manage()
         for row in self.manage_data:
-            if row[0] == string:
+            if row[0] == serial_num:
                 temp = row[2]
         
-        self.serial_ID[cell_num] = string
+        self.serial_ID[cell_num] = str(serial_num)
 
         for row in self.manage_data:
-            if row[0] == string:
+            if row[0] == serial_num:
                 #row[4] = username
                 row[3] = 1 #machine_ID #とりあえず今は1
             
@@ -98,7 +98,6 @@ class csv_manager:
                     #self.tool_size[i] = row[2]
         self.update_state()
         self.update_manage()
-    
     
     def log(self, string):
         current_time = datetime.datetime.now()

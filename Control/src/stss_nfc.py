@@ -12,7 +12,11 @@ from smartcard.Exceptions import CardConnectionException
 #タグのNFC Toolsによるテキスト書き込み : "   i,str," <- (i : NFC_TYPE, str : content)
 #スペース3つ先頭、カンマ区切り
 #これで 7ブロック読み取り開始でちょうどiから読み取れる
+GET_INF  = [0xFF, 0xB0 ,0x00, 0x05, 0x10]
+GET_INF2 = [0xFF, 0xB0 ,0x00, 0x09, 0x10]
 GET_INF_01 = [0xFF, 0xB0 ,0x00, 0x07, 0x00]
+
+stss_format_header = 'STSS_TAG'
 
 class nfcReader:
     def __init__(self):
@@ -60,3 +64,25 @@ class nfcReader:
         NFC_TYPE = int(tmp[0])
         print('temp[1] = ',tmp[1])
         return NFC_TYPE,tmp[1]
+    
+    def get_data_v2(self):
+        data02,sw021,sw022 = self.connection.transmit(GET_INF)
+        extracted_bytes = data02[0:]
+        ascii_chars = [chr(byte) for byte in extracted_bytes]
+        string = ''.join(ascii_chars)
+
+        #print('01 : ' + string)
+        data03,sw021,sw022 = self.connection.transmit(GET_INF2)
+        #print(data03)
+        extracted_bytes = data03[0:]
+        ascii_chars = [chr(byte) for byte in extracted_bytes]
+        string = string + ''.join(ascii_chars)
+
+        print('get_string : ' + string)
+        tmp = string.split(stss_format_header)
+        #print(tmp)
+        tmp2 = tmp[1].split(',')
+        #print(tmp2)
+        NFC_TYPE = int(tmp2[0])
+        print('temp[1] = ',tmp2[1])
+        return NFC_TYPE,tmp2[1]
