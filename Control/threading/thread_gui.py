@@ -43,7 +43,7 @@ def gui_main():
     elif gui_event == 6:
         disp_text.set("ボックスがいっぱいです")
 
-    #cuiroot.mainloop() 
+    #cuiroot.mainloop()
 
 def button_appear():
     #state.csvの情報を読む
@@ -191,7 +191,7 @@ def base_sys():
                     while True:
                         if gui_com != 0:
                             break
-                    '''                
+                    ''' 
                 else:
                     #シリアルIDカードをかざした場合
                     ##格納動作

@@ -12,7 +12,6 @@ gui = {} #現在使用中のウィジェット
 TOOL_SELECT = 'tool_select'
 FINISH_DEPOSIT = 'finish_deposit'
 
-
 #GUI widget names
 
 #page 1

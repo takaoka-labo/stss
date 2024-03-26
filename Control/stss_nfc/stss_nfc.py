@@ -21,17 +21,39 @@ class nfcReader:
         try:
             self.connection = self.reader[0].createConnection()
             self.connection.connect()
+            print('connect')
         
         except NoCardException:
             print("No card found")
+            return False
 
         except CardConnectionException:
             print("Card connection error")
+            return False
 
         except IndexError:
             print("No reader found")
+            return False
         
+        else:
+            return True
+
     def get_data(self):
-        data01,sw011,sw012 = self.connection.transmit(GET_INF_00)
-        data02,sw021,sw022 = self.connection.transmit(GET_INF_01)
-        return data01,data02
+        try:
+            self.connection = self.reader[0].createConnection()
+            self.connection.connect()
+            data01,sw011,sw012 = self.connection.transmit(GET_INF_00)
+            data02,sw021,sw022 = self.connection.transmit(GET_INF_01)
+            return [True,(data01,data02)]
+
+        except NoCardException:
+            print("No card found")
+            return [False,None]
+
+        except CardConnectionException:
+            print("Card connection error")
+            return [False,None]
+
+        except IndexError:
+            print("No reader found")
+            return [False,None]
