@@ -44,7 +44,7 @@ def withdraw(root,phase,*arg): # 0:USER_NAME 1:cell_num
         print('selected : ' + str(arg[0][1]))
 
         #CLI更新
-        stss_gui.gui[stss_gui.P1_CLI].update_text(0.,'please waite...')
+        stss_gui.gui[stss_gui.P1_CLI].update_text(0.,'please wait...')
 
         #ボタン非表示
         stss_gui.gui[stss_gui.P1_BUTTON_ARRAY].destroy()

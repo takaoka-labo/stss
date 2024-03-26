@@ -1,5 +1,7 @@
 import os
 import sys, tty, termios
+sys.path.append(os.pardir)
+
 if __name__ == "__main__":
     from scservo_sdk import *                # Uses SCServo SDK library
 else:

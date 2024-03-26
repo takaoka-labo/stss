@@ -45,7 +45,7 @@ def Arrange_ToolButton(root):
 
     # 読み込んだ情報をもとに取り出し用のボタンを作成
     for index, row in df.iterrows():
-        button = create_button(button_panel, str(row.iloc[1]), str(row.iloc[2]), next_page = None, flag_name = TOOL_SELECT)
+        button = create_button(button_panel, str(row.iloc[0]), str(row.iloc[2]), next_page = None, flag_name = TOOL_SELECT)
         button.place(x=10 + index * 30, y=0)  # ボタンの位置を調整
         buttons[str(row.iloc[2])] = button
     #print('debug arrange_toolbutton')
@@ -103,8 +103,8 @@ def wait_push(root,flag_name,func,before_phase,*arg):
         flags[flag_name] = (False,flags[flag_name][1])
         func(root, before_phase + 1, arg + (flags[flag_name][1],))
     else:
-        print(after_id)
-        print(arg)
+        #print(after_id)
+        #print(arg)
         after_id = root.after(200,wait_push,root,flag_name,func,before_phase,*arg)
 
 class CLI:
