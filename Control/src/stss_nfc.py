@@ -27,15 +27,15 @@ class nfcReader:
             self.connection = self.reader[0].createConnection()
             self.connection.connect()
         except NoCardException:
-            print("No card found")
+            #print("No card found")
             return False
 
         except CardConnectionException:
-            print("Card connection error")
+            #print("Card connection error")
             return False
 
         except IndexError:
-            print("No reader found")
+            #print("No reader found")
             return False
         else:
             return True
@@ -56,6 +56,7 @@ class nfcReader:
         string = ''.join(ascii_chars)
         #print(string)
         tmp = string.split(',')
+        print(tmp)
         NFC_TYPE = int(tmp[0])
         print('temp[1] = ',tmp[1])
         return NFC_TYPE,tmp[1]

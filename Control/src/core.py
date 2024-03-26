@@ -17,15 +17,19 @@ def main_menu(root):
     nfc_detected = nfc.connect()
     #func_mode = function_number
     if nfc_detected:
-        NFC_TYPE,string = nfc.get_data()
-        #print(string)
-        #degugging
-        #func_mode = int(input('enter function_number'))
-        func_mode = NFC_TYPE
-        #arg = NFC_arg_debug
-        arg = string
-        current_page = func_mode
-        stss_gui.main_function[func_mode][1](root,0,arg) # start each function from phase : 0
+        try:
+            NFC_TYPE,string = nfc.get_data()
+            #print(string)
+            #degugging
+            #func_mode = int(input('enter function_number'))
+            func_mode = NFC_TYPE
+            #arg = NFC_arg_debug
+            arg = string
+            current_page = func_mode
+            stss_gui.main_function[func_mode][1](root,0,arg) # start each function from phase : 0
+        except Exception as e:
+            print(e)
+            stss_gui.after_id = root.after(200,main_menu,root)
     else:
         stss_gui.after_id = root.after(200,main_menu,root)
 
@@ -41,7 +45,7 @@ def withdraw(root,phase,*arg): # 0:USER_NAME 1:cell_num
 
     elif phase == 1:
         print(arg[0])
-        print('selected : ' + str(arg[0][1]))
+        print('selected cell_ID: ' + str(arg[0][1]))
 
         #CLI更新
         stss_gui.gui[stss_gui.P1_CLI].update_text(0.,'please wait...')
@@ -61,7 +65,7 @@ def withdraw(root,phase,*arg): # 0:USER_NAME 1:cell_num
 
         #管理ファイル更新
         #print(USER_NAME[0])
-        csv_master.update_withdraw(arg[0][1],arg[0][0])
+        csv_master.update_withdraw(arg[0][0],int(arg[0][1]) - 1)
 
         #finish
         stss_gui.return_main_menu(root)
@@ -70,7 +74,7 @@ stss_gui.flags[stss_gui.TOOL_SELECT] = (False,None)
 stss_gui.main_function.append(('withdraw',withdraw))
 
 #main function : 2
-def deposit(root,phase,*arg): # 0:SERIAL_NUMBER
+def deposit(root,phase,*arg): # 0:SERIAL_NUMBER 1:cell_num
     global current_page
     print(arg)
     if phase == 0:
@@ -81,10 +85,10 @@ def deposit(root,phase,*arg): # 0:SERIAL_NUMBER
 
         #state.csvからcell_num取得
         cell_num = csv_master.search_vacant_cell()
-        print(cell_num)
+        print('cell_ID : ' + str(cell_num + 1))
 
         #回転
-        revolver.position(cell_num - 1)
+        revolver.position(cell_num)
 
         #CLI更新
         stss_gui.gui[stss_gui.P2_CLI].update_text(tkinter.END,'\nopen')
@@ -96,12 +100,15 @@ def deposit(root,phase,*arg): # 0:SERIAL_NUMBER
         stss_gui.check_button(root)
         
         #GUI操作待ち
-        stss_gui.wait_push(root,stss_gui.FINISH_DEPOSIT,deposit,phase,arg[0])
+        stss_gui.wait_push(root,stss_gui.FINISH_DEPOSIT,deposit,phase,arg[0],cell_num)
+
     elif phase == 1:
         #管理ファイル更新
-        print(arg)
+        print('arg = ')
+        print(*arg)
+        temp, *_ = arg
         door.close()
-        csv_master.update_deposite(arg[0][0])
+        csv_master.update_deposit(temp[0], temp[1])
 
         #finish
         stss_gui.return_main_menu(root)

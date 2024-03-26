@@ -53,18 +53,20 @@ class csv_manager:
             print(self.manage_data)
         self.manage_data.clear()
     
-    def update_withdraw(self, input_number, username):#input_numberは取り出す工具のシリアルID
+    #cell_num = cell_ID - 1
+    def update_withdraw(self, username, cell_num):
         self.get_state()
         self.get_manage()
-        for i in range(len(self.serial_ID)):
-            if self.serial_ID[i] == input_number:  
-                self.serial_ID[i] = -1
-                self.tool_name[i] = "none"
-                #self.tool_size[i] = "none"
-                for row in self.manage_data:
-                    if row[0] == input_number:
-                        row[4] = username
-                        row[3] = "using" 
+        
+        serial_id = self.serial_ID[cell_num]
+        self.serial_ID[cell_num] = -1
+        self.tool_name[cell_num] = "none"
+        
+        for row in self.manage_data:
+            if row[0] == serial_id:
+                row[4] = username
+                row[3] = "using" 
+                
         self.update_state()
         self.update_manage()
         
@@ -75,21 +77,19 @@ class csv_manager:
                 return i
         return -1
         
-    def update_deposite(self, string):
+    def update_deposit(self, string,cell_num):
         self.get_state()
         self.get_manage()
         for row in self.manage_data:
             if row[0] == string:
                 temp = row[2]
-        for i in range(len(self.cell_ID)):
-            if self.serial_ID[i] == "-1" and self.cell_size[i] == temp:
-                self.serial_ID[i] = string
-                
-                for row in self.manage_data:
-                    if row[0] == string:
-                        #row[4] = username
-                        row[3] = 1 #machine_ID #とりあえず今は1
-                break
+        
+        self.serial_ID[cell_num] = string
+
+        for row in self.manage_data:
+            if row[0] == string:
+                #row[4] = username
+                row[3] = 1 #machine_ID #とりあえず今は1
             
         for i in range(len(self.serial_ID)) :
             for row in self.manage_data :
