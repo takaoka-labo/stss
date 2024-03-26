@@ -7,43 +7,39 @@ class csv_manager:
         self.serial_ID = []
         self.tool_name = []
         self.tool_size = []
-        self.cell_size = []
         self.manage_data = []
         
     def get_state(self):
         self.cell_ID.clear()
         self.serial_ID.clear()
-        self.tool_name.clear()
-        self.cell_size.clear() 
+        self.tool_name.clear() 
+        self.tool_size.clear()
         with open('state.csv', 'r') as f:
             csv_reader = csv.reader(f)
             for row in csv_reader:
                 self.cell_ID.append(row[0])
                 self.serial_ID.append(row[1])
                 self.tool_name.append(row[2])
-                self.cell_size.append(row[3])
-                #self.tool_size.append(row[3])
+                self.tool_size.append(row[3])
         return self.cell_ID, self.serial_ID, self.tool_name, self.tool_size
     
     def get_manage(self):
-        self.tool_size.clear()
         with open('manage.csv', 'r') as f:
             csv_reader = csv.reader(f)
             for row in csv_reader:
                 self.manage_data.append(row)
-                self.tool_size.append(row[2])
         return self.manage_data
     
     def update_state(self):
         with open('state.csv', 'w', newline='') as f:
             csv_writer = csv.writer(f)
             for i in range(len(self.cell_ID)) :
-                csv_writer.writerow([self.cell_ID[i], self.serial_ID[i], self.tool_name[i], self.cell_size[i]])
+                csv_writer.writerow([self.cell_ID[i], self.serial_ID[i], self.tool_name[i], self.tool_size[i]])
             print(self.cell_ID, self.serial_ID, self.tool_name, self.tool_size)
         self.cell_ID.clear()
         self.serial_ID.clear()
         self.tool_name.clear() 
-        self.cell_size.clear()
+        self.tool_size.clear()
             
     
     def update_manage(self):
@@ -60,7 +56,7 @@ class csv_manager:
             if self.serial_ID[i] == input_number:  
                 self.serial_ID[i] = -1
                 self.tool_name[i] = "none"
-                #self.tool_size[i] = "none"
+                self.tool_size[i] = "none"
                 for row in self.manage_data:
                     if row[0] == input_number:
                         row[4] = username
@@ -78,13 +74,9 @@ class csv_manager:
     def update_deposite(self, string):
         self.get_state()
         self.get_manage()
-        for row in self.manage_data:
-            if row[0] == string:
-                temp = row[2]
         for i in range(len(self.cell_ID)):
-            if self.serial_ID[i] == "-1" and self.cell_size[i] == temp:
+            if self.serial_ID[i] == "-1" :
                 self.serial_ID[i] = string
-                
                 for row in self.manage_data:
                     if row[0] == string:
                         #row[4] = username
@@ -95,9 +87,11 @@ class csv_manager:
             for row in self.manage_data :
                 if self.serial_ID[i] == row[0]:
                     self.tool_name[i] = row[1]
-                    #self.tool_size[i] = row[2]
+                    self.tool_size[i] = row[2]
         self.update_state()
         self.update_manage()
+    
+    
     
     
     def log(self, string):
